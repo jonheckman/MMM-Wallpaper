@@ -7,6 +7,7 @@ const express = require("express");
 const crypto = require("crypto");
 const http = require("http");
 const https = require("https");
+const Log = require('../../js/logger.js');
 
 function shuffle(a) {
   var source = a.slice(0);
@@ -55,6 +56,7 @@ module.exports = NodeHelper.create({
   },
 
   fetchWallpapers: function(config) {
+    console.log(`MMM-Wallpaper: Fetching Images`);
     var self = this;
     var result = self.getCacheEntry(config);
     var method = "GET";
@@ -141,6 +143,9 @@ module.exports = NodeHelper.create({
   },
 
   readdir: function(config) {
+    Log.info(
+      'MMM-Wallpaper: Reading images from directory'
+    );
     var self = this;
     var result = self.getCacheEntry(config);
     const path = config.source.substring(6).trim();

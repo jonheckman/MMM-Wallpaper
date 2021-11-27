@@ -29,3 +29,27 @@
   font-size: 14px;
   line-height: 25px;
 }
+
+.MMM-Wallpaper .pictureinfo {
+  display: inline-block;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.2);
+  font-weight: 100;
+  font-size: 22px;
+  line-height: 25px;
+  position: absolute;
+  bottom: 0pt;
+  right: 0pt;
+}
+
+.MMM-Wallpaper .debuginfo {
+  display: inline-block;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.2);
+  font-weight: 100;
+  font-size: 22px;
+  line-height: 25px;
+  position: absolute;
+  bottom: 0pt;
+  left: 0pt;
+}

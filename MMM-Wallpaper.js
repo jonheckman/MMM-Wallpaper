@@ -18,6 +18,9 @@ Module.register("MMM-Wallpaper", {
     flickrHighRes: true,
     shuffle: true,
     addCacheBuster: true,
+    showPictureInfo: false,
+    pictureInfoFormatting: "%imagenum/%imagecount<br/>%url",
+    debug: false
   },
 
   getStyles: function() {
@@ -36,11 +39,29 @@ Module.register("MMM-Wallpaper", {
     self.img = null;
     self.nextImg = null;
     self.title = document.createElement("div");
+
     self.fadeClass = self.config.crossfade ? "crossfade-image" : "";
 
     self.wrapper.className = "MMM-Wallpaper";
     self.wrapper.appendChild(self.content);
     self.content.appendChild(self.title);
+
+    if (this.config.showPictureInfo) {
+      self.imageinfo = document.createElement("div");
+      self.imageinfo.className = 'pictureinfo';
+      self.content.appendChild(self.imageinfo);
+    }
+    if (this.config.debug) {
+      self.debuginfo = document.createElement("div");
+      self.debuginfo.className = 'debuginfo';
+      self.content.appendChild(self.debuginfo);
+    }
+
+    let innerHTML = '<header class="infoDivHeader">Picture Info</header>';
+
+    this.imageinfo.innerHTML = innerHTML;
+
+    // self.wrapper.appendChild(self.createInfo);
 
     self.content.className = "content";
     self.title.className = "title";
@@ -50,6 +71,9 @@ Module.register("MMM-Wallpaper", {
   },
 
   notificationReceived: function(notification, payload, sender) {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "NOTIFICATION RECEIVED" + notification + " ... " + payload + " ... " + sender;
+    }
     var self = this;
 
     if (notification === "LOAD_NEXT_WALLPAPER") {
@@ -58,6 +82,9 @@ Module.register("MMM-Wallpaper", {
   },
 
   socketNotificationReceived: function(notification, payload) {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "SOCKET NOTIFICATION RECEIVED" + notification + " ... " + payload;
+    }
     var self = this;
 
     if (notification === "WALLPAPERS") {
@@ -81,6 +108,15 @@ Module.register("MMM-Wallpaper", {
   },
 
   getData: function() {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "FETCHING IMAGES";
+    }
+    Log.info(
+      'MMM-Wallpaper: Fetching Images'
+    );
+    console.log(
+      `MMM-Wallpaper: Fetching Images`
+    );
     var self = this;
     var config = Object.assign({}, self.config);
 
@@ -89,6 +125,9 @@ Module.register("MMM-Wallpaper", {
   },
 
   getOrientation: function() {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "GET ORIENTATION";
+    }
     var self = this;
 
     if (self.config.orientation === "auto") {
@@ -100,6 +139,9 @@ Module.register("MMM-Wallpaper", {
   },
 
   onImageLoaded: function(img) {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "ON IMAGE LOADED" + img;
+    }
     var self = this;
 
     return () => {
@@ -126,6 +168,9 @@ Module.register("MMM-Wallpaper", {
   },
 
   createImage: function(url) {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "CREATE IMAGE" + url;
+    }
     var self = this;
     var img = document.createElement("img");
 
@@ -138,10 +183,16 @@ Module.register("MMM-Wallpaper", {
   },
 
   getDom: function() {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "GET DOM";
+    }
     return this.wrapper;
   },
 
   getViewport: function() {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "GET VIEWPORT";
+    }
     var w = window;
     var e = document.documentElement;
     var g = document.body;
@@ -153,6 +204,9 @@ Module.register("MMM-Wallpaper", {
   },
 
   getImageUrl: function(image) {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "GET GET IMAGE URL" + image;
+    }
     var viewport = this.getViewport();
     var url = image.url;
 
@@ -176,7 +230,12 @@ Module.register("MMM-Wallpaper", {
   },
 
   loadNextImage: function() {
+    if (this.config.debug) {
+      this.debuginfo.innerHTML = "LOAD NEXT IMAGE";
+    }
     var self = this;
+    
+    let innerHTML = self.config.pictureInfoFormatting;
 
     if (self.nextImg !== null) {
       return;
@@ -185,10 +244,17 @@ Module.register("MMM-Wallpaper", {
     self.imageIndex = (self.imageIndex + 1) % self.images.length;
     self.nextImage = self.images[self.imageIndex];
 
+    
+    innerHTML = innerHTML.replace("%imagenum", self.imageIndex)
+    innerHTML = innerHTML.replace("%imagecount", self.images.length)
+
     if (self.nextImage !== null) {
       self.nextImg = self.createImage(self.getImageUrl(self.nextImage));
       self.content.insertBefore(self.nextImg, self.title);
+      innerHTML = innerHTML.replace("%url", self.nextImage.url)
     }
+
+    this.imageinfo.innerHTML = innerHTML;
 
     if (self.config.slideInterval > 0) {
       clearTimeout(self.loadNextImageTimer);
